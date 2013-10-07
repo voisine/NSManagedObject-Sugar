@@ -79,7 +79,6 @@
     request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:key ascending:ascending]];
     request.fetchOffset = offset;
     request.fetchLimit = limit;
-    
     return [self fetchObjects:request];
 }
 
@@ -155,13 +154,14 @@
             [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
         NSError *error = nil;
         
-        if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil
-               error:&error]) {
+        if ([coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL
+             options:@{NSMigratePersistentStoresAutomaticallyOption:@(YES),
+                       NSInferMappingModelAutomaticallyOption:@(YES)} error:&error] == nil) {
             NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
 #if DEBUG
             abort();
 #else
-            // if this is not a debug build, attempt to delete and create a new persisent data store before crashing
+            // if this is a not a debug build, attempt to delete and create a new persisent data store before crashing
             if (! [[NSFileManager defaultManager] removeItemAtURL:storeURL error:&error]) {
                 NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
             }
@@ -215,7 +215,7 @@
     return [NSFetchRequest fetchRequestWithEntityName:[self entityName]];
 }
 
-+ (NSFetchedResultsController *)fetchedResultsControllerWithFetchRequest:(NSFetchRequest *)request
++ (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request
 {
     __block NSFetchedResultsController *c = nil;
 
