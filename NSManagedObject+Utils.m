@@ -166,8 +166,9 @@
                 NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
             }
             
-            if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil
-                   error:&error]) {
+            if ([coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL
+                 options:@{NSMigratePersistentStoresAutomaticallyOption:@(YES),
+                           NSInferMappingModelAutomaticallyOption:@(YES)} error:&error] == nil) {
                 NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
                 abort(); // Forsooth, I am slain!
             }
@@ -231,6 +232,24 @@
 {
     [[self managedObjectContext] performBlockAndWait:^{
         [[self managedObjectContext] deleteObject:self];
+    }];
+}
+
+- (id)get:(NSString *)key
+{
+    __block id value = nil;
+    
+    [[self managedObjectContext] performBlockAndWait:^{
+        value = [self valueForKey:key];
+    }];
+
+    return value;
+}
+
+- (void)set:(NSString *)key to:(id)value
+{
+    [[self managedObjectContext] performBlockAndWait:^{
+        [self setValue:value forKey:key];
     }];
 }
 

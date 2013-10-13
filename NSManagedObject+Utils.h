@@ -48,5 +48,7 @@
 + (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request;
 
 - (void)deleteObject;
+- (id)get:(NSString *)key; // thread safe valueForKey:
+- (void)set:(NSString *)key to:(id)value; // thread safe setValue:forKey:
 
 @end
