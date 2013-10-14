@@ -41,6 +41,22 @@
     return obj;
 }
 
++ (NSArray *)managedObjectArrayWithLength:(NSUInteger)length
+{
+    __block NSEntityDescription *entity = nil;
+    NSMutableArray *a = [NSMutableArray arrayWithCapacity:length];
+    
+    [[self context] performBlockAndWait:^{
+        entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self context]];
+        
+        for (NSUInteger i = 0; i < length; i++) {
+            [a addObject:[[self alloc] initWithEntity:entity insertIntoManagedObjectContext:[self context]]];
+        }
+    }];
+    
+    return a;
+}
+
 #pragma mark - fetch existing objects
 
 + (NSArray *)allObjects
@@ -93,6 +109,15 @@
     }];
      
     return a;
+}
+
++ (void)deleteObjects:(NSArray *)objects
+{
+    [[self context] performBlockAndWait:^{
+        [objects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            [[self context] deleteObject:obj];
+        }];
+    }];
 }
 
 #pragma mark - count exising objects

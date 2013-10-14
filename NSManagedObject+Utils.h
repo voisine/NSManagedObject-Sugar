@@ -27,6 +27,7 @@
 @interface NSManagedObject (Utils)
 
 + (instancetype)managedObject;
++ (NSArray *)managedObjectArrayWithLength:(NSUInteger)length;
 
 + (NSArray *)allObjects;
 + (NSArray *)objectsMatching:(NSString *)predicateFormat, ...;
@@ -39,6 +40,8 @@
 + (NSUInteger)countObjectsMatching:(NSString *)predicateFormat, ...;
 + (NSUInteger)countObjectsMatching:(NSString *)predicateFormat arguments:(va_list)args;
 + (NSUInteger)countObjects:(NSFetchRequest *)request;
+
++ (void)deleteObjects:(NSArray *)objects;
 
 + (NSManagedObjectContext *)context;
 + (void)saveContext;
