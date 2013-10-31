@@ -37,7 +37,7 @@ Example:
         // delete an instance of an entity
         [entity deleteObject];
         
-        // persist changes
+        // persist changes (this happens automatically when the app terminates)
         [NSManagedObject saveContext];
         
     ...
