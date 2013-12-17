@@ -221,7 +221,6 @@ static NSUInteger _fetchBatchSize = 100;
         if (coordinator) {
             // create a separate context for writing to the persistent store asynchronously
             writermoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-            writermoc.undoManager = nil;
             writermoc.persistentStoreCoordinator = coordinator;
 
             mainmoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:_concurrencyType];
@@ -245,7 +244,7 @@ static NSUInteger _fetchBatchSize = 100;
     [[self context] performBlock:^{
         NSError *error = nil;
 
-        if (! [[self context] save:&error]) { // save changes to writer context
+        if ([[self context] hasChanges] && ! [[self context] save:&error]) { // save changes to writer context
             NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
 #if DEBUG
             abort();
@@ -255,16 +254,15 @@ static NSUInteger _fetchBatchSize = 100;
         [[self context].parentContext performBlock:^{
             NSError *error = nil;
             NSUInteger taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
-            NSTimeInterval t = [NSDate timeIntervalSinceReferenceDate];
 
-            if (! [[self context].parentContext save:&error]) { // write changes to persistent store
+            // write changes to persistent store
+            if ([[self context].parentContext hasChanges] && ! [[self context].parentContext save:&error]) {
                 NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
 #if DEBUG
                 abort();
 #endif
             }
 
-            NSLog(@"context save completed in %f seconds", [NSDate timeIntervalSinceReferenceDate] - t);
             [[UIApplication sharedApplication] endBackgroundTask:taskId];
         }];
     }];
