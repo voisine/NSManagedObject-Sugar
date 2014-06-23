@@ -63,8 +63,8 @@
 + (NSFetchRequest *)fetchRequest;
 + (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request;
 
-- (id)objectForKeyedSubscript:(id <NSCopying>)key // thread safe valueForKey:
-- (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key // thread safe setValue:forKey:
+- (id)objectForKeyedSubscript:(id <NSCopying>)key; // thread safe valueForKey:
+- (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key; // thread safe setValue:forKey:
 - (void)deleteObject;
 
 @end

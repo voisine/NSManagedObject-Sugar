@@ -290,13 +290,6 @@ static NSUInteger _fetchBatchSize = 100;
             sectionNameKeyPath:nil cacheName:nil];
 }
 
-- (void)deleteObject
-{
-    [[self managedObjectContext] performBlockAndWait:^{
-        [[self managedObjectContext] deleteObject:self];
-    }];
-}
-
 // custom keyed subscripting, thread safe valueForKey:
 - (id)objectForKeyedSubscript:(id <NSCopying>)key
 {
@@ -314,6 +307,13 @@ static NSUInteger _fetchBatchSize = 100;
 {
     [[self managedObjectContext] performBlockAndWait:^{
         [self setValue:obj forKey:(NSString *)key];
+    }];
+}
+
+- (void)deleteObject
+{
+    [[self managedObjectContext] performBlockAndWait:^{
+        [[self managedObjectContext] deleteObject:self];
     }];
 }
 
