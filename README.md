@@ -33,7 +33,13 @@ Example:
         
         // count how many instances match a predicate query
         count = [MyEntity countObjectsMatching:@"attribute == %@", @"value"];
-        
+
+	// thread safe valueForKey:
+	id value = entity[@"attribute"];
+
+	// thread safe setValue:forKey:
+	entity[@"attribute"] = value;        
+
         // delete an instance of an entity
         [entity deleteObject];
         

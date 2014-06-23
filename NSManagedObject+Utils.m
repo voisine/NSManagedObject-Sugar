@@ -226,7 +226,7 @@ static NSUInteger _fetchBatchSize = 100;
             mainmoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:_concurrencyType];
             mainmoc.parentContext = writermoc;
             
-            // Saves changes in the application's managed object context before the application terminates.
+            // this will save changes to the persistent store before the application terminates.
             [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification object:nil
              queue:nil usingBlock:^(NSNotification *note) {
                 [self saveContext];
@@ -270,6 +270,7 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - entity methods
 
+// override this if entity name differs from class name
 + (NSString *)entityName
 {
     return NSStringFromClass([self class]);
@@ -285,14 +286,8 @@ static NSUInteger _fetchBatchSize = 100;
 
 + (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request
 {
-    __block NSFetchedResultsController *c = nil;
-
-    [[self context] performBlockAndWait:^{
-        c = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:[self context]
-             sectionNameKeyPath:nil cacheName:nil];
-    }];
-    
-    return c;
+    return [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:[self context]
+            sectionNameKeyPath:nil cacheName:nil];
 }
 
 - (void)deleteObject
@@ -302,23 +297,23 @@ static NSUInteger _fetchBatchSize = 100;
     }];
 }
 
-// thread safe valueForKey:
-- (id)get:(NSString *)key
+// custom keyed subscripting, thread safe valueForKey:
+- (id)objectForKeyedSubscript:(id <NSCopying>)key
 {
-    __block id value = nil;
-    
+    __block id obj = nil;
+
     [[self managedObjectContext] performBlockAndWait:^{
-        value = [self valueForKey:key];
+        obj = [self valueForKey:(NSString *)key];
     }];
 
-    return value;
+    return obj;
 }
 
-// thread safe setValue:forKey:
-- (void)set:(NSString *)key to:(id)value
+// custom keyed subscripting, thread safe setValue:forKey:
+- (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
 {
     [[self managedObjectContext] performBlockAndWait:^{
-        [self setValue:value forKey:key];
+        [self setValue:obj forKey:(NSString *)key];
     }];
 }
 

@@ -59,12 +59,12 @@
 
 + (void)saveContext;
 
-+ (NSString *)entityName;
++ (NSString *)entityName; // override this if entity name differs from class name
 + (NSFetchRequest *)fetchRequest;
 + (NSFetchedResultsController *)fetchedResultsController:(NSFetchRequest *)request;
 
+- (id)objectForKeyedSubscript:(id <NSCopying>)key // thread safe valueForKey:
+- (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key // thread safe setValue:forKey:
 - (void)deleteObject;
-- (id)get:(NSString *)key; // thread safe valueForKey:
-- (void)set:(NSString *)key to:(id)value; // thread safe setValue:forKey:
 
 @end
