@@ -1,5 +1,5 @@
 //
-//  NSManagedObject+Utils.m
+//  NSManagedObject+Sugar.m
 //
 //  Created by Aaron Voisine on 8/22/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -22,12 +22,12 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import "NSManagedObject+Utils.h"
+#import "NSManagedObject+Sugar.h"
 
 static NSManagedObjectContextConcurrencyType _concurrencyType = NSMainQueueConcurrencyType;
 static NSUInteger _fetchBatchSize = 100;
 
-@implementation NSManagedObject (Utils)
+@implementation NSManagedObject (Sugar)
 
 #pragma mark - create objects
 
@@ -108,7 +108,7 @@ static NSUInteger _fetchBatchSize = 100;
 
     [[self context] performBlockAndWait:^{
         a = [[self context] executeFetchRequest:request error:&error];
-        if (! a) NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
+        if (error) NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
     }];
      
     return a;
@@ -147,7 +147,7 @@ static NSUInteger _fetchBatchSize = 100;
 
     [[self context] performBlockAndWait:^{
         count = [[self context] countForFetchRequest:request error:&error];
-        if (count == NSNotFound) NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
+        if (error) NSLog(@"%s:%d %s: %@", __FILE__, __LINE__, __FUNCTION__, error);
     }];
     
     return count;
@@ -168,7 +168,7 @@ static NSUInteger _fetchBatchSize = 100;
 
 #pragma mark - core data stack
 
-// call this before any NSManagedObject+Utils methods to use a concurrency type other than NSMainQueueConcurrencyType
+// call this before any NSManagedObject+Sugar methods to use a concurrency type other than NSMainQueueConcurrencyType
 + (void)setConcurrencyType:(NSManagedObjectContextConcurrencyType)type
 {
     _concurrencyType = type;
@@ -290,8 +290,8 @@ static NSUInteger _fetchBatchSize = 100;
             sectionNameKeyPath:nil cacheName:nil];
 }
 
-// custom keyed subscripting, thread safe valueForKey:
-- (id)objectForKeyedSubscript:(id <NSCopying>)key
+// id value = entity[@"key"]; thread safe valueForKey:
+- (id)objectForKeyedSubscript:(id<NSCopying>)key
 {
     __block id obj = nil;
 
@@ -302,8 +302,8 @@ static NSUInteger _fetchBatchSize = 100;
     return obj;
 }
 
-// custom keyed subscripting, thread safe setValue:forKey:
-- (void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
+// entity[@"key"] = value; thread safe setValue:forKey:
+- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key
 {
     [[self managedObjectContext] performBlockAndWait:^{
         [self setValue:obj forKey:(NSString *)key];

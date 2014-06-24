@@ -1,11 +1,13 @@
-NSManagedObject-Utils
+NSManagedObject+Sugar
 =====================
 
-NSManagedObject category providing a cleaner, simpler way to use CoreData.
+CoreData syntactic sugar
+
+an NSManagedObject category providing a sweeter way to use CoreData
 
 Example:
 
-    #import "NSManagedObject+Utils.h"
+    #import "NSManagedObject+Sugar.h"
 
     ...
 
@@ -43,7 +45,7 @@ Example:
         // delete an instance of an entity
         [entity deleteObject];
         
-        // persist changes (this happens automatically when the app terminates)
+        // persist changes (this also happens automatically when the app terminates)
         [NSManagedObject saveContext];
         
     ...
